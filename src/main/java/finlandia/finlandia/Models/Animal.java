@@ -45,7 +45,7 @@ public class Animal {
 
     @ManyToOne
     @JoinColumn(name = "idUser")
-    private User user;
+    private UserEntity user;
 
     @OneToMany(mappedBy = "animal")
     private List<AnimalWeightAssociation> animalWeightAssociation;
