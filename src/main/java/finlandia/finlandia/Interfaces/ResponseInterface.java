@@ -1,6 +1,10 @@
 package finlandia.finlandia.Interfaces;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 
+@Builder
+@AllArgsConstructor
 public class ResponseInterface {
     private String message;
     private Boolean success;

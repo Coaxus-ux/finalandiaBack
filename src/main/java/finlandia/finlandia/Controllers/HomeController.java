@@ -36,7 +36,7 @@ public class HomeController {
                 return ResponseEntity.status(400).body(responseInterface);
             }
             responseInterface.setSuccess(true);
-            responseInterface.setMessage("User created successfully");
+            responseInterface.setMessage(response.getMessage());
             responseInterface.setData(user);
             return ResponseEntity.status(201).body(responseInterface);
         }catch (Exception e){

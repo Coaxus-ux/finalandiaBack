@@ -50,5 +50,11 @@ public class Animal {
     @OneToMany(mappedBy = "animal")
     private List<AnimalWeightAssociation> animalWeightAssociation;
 
+    @ManyToOne
+    @JoinColumn(name = "animal_mother")
+    private AnimalMother animalMother;
 
+    @ManyToOne
+    @JoinColumn(name = "animal_father")
+    private AnimalFather animalFather;
 }
