@@ -20,7 +20,7 @@ public class AnimalFather {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id_animal_father")
-    private UUID IdAnimalMother;
+    private UUID idAnimalFather;
 
     @Column(name = "fedegan_code", columnDefinition = "VARCHAR(255)")
     private String fedeganCode;
