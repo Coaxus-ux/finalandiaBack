@@ -2,17 +2,18 @@ package finlandia.finlandia.DAO.AnimalFather;
 
 import finlandia.finlandia.Interfaces.CommunicationInterface;
 import finlandia.finlandia.Models.AnimalFather;
+import finlandia.finlandia.Utils.DTOAnimalParent;
 
 public interface AnimalFatherInterface {
-    CommunicationInterface createAnimalFather(AnimalFather animalFather);
+    CommunicationInterface createAnimalFather(DTOAnimalParent dtoAnimalParent);
 
     CommunicationInterface getAllFather();
 
-    CommunicationInterface getByUUID(AnimalFather animalFather);
+    CommunicationInterface getByUUID(DTOAnimalParent dtoAnimalParent);
 
-    CommunicationInterface getByFedeganCode(AnimalFather animalFather);
+    CommunicationInterface getByFedeganCode(DTOAnimalParent dtoAnimalParent);
 
-    CommunicationInterface editFather(AnimalFather animalFather);
+    CommunicationInterface editFather(DTOAnimalParent dtoAnimalParent);
 
-    CommunicationInterface deleteFather(AnimalFather animalFather);
+    CommunicationInterface deleteFather(DTOAnimalParent dtoAnimalParent);
 }

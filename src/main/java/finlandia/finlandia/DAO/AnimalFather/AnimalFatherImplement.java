@@ -1,10 +1,14 @@
 package finlandia.finlandia.DAO.AnimalFather;
 
+import finlandia.finlandia.DAO.AnimalMother.AnimalMotherInterface;
 import finlandia.finlandia.Interfaces.CommunicationInterface;
 import finlandia.finlandia.Models.AnimalFather;
+import finlandia.finlandia.Models.AnimalMother;
+import finlandia.finlandia.Utils.DTOAnimalParent;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
@@ -18,17 +22,35 @@ public class AnimalFatherImplement implements AnimalFatherInterface {
     EntityManager entityManager;
 
     @Override
-    public CommunicationInterface createAnimalFather(AnimalFather animalFather){
+    public CommunicationInterface createAnimalFather(DTOAnimalParent dtoAnimalParent){
         try {
             String query = "FROM AnimalFather WHERE fedeganCode=:fedegan_code";
             List<AnimalFather> animal = entityManager.createQuery(query)
-                    .setParameter("fedegan_code", animalFather.getFedeganCode())
+                    .setParameter("fedegan_code", dtoAnimalParent.getFedeganCode())
                     .getResultList();
             Map<String, Object> animalMap = new HashMap<>();
             if(!animal.isEmpty()){
+                String queryMother = "FROM AnimalMother WHERE fedeganCode=:fedegan_code";
+                List<AnimalMother> animalMother = entityManager.createQuery(queryMother)
+                        .setParameter("fedegan_code", dtoAnimalParent.getFedeganCode())
+                        .getResultList();
+                if(dtoAnimalParent.getFedeganCode().equals("")){
+                    if(animalMother.get(0).getFedeganCode().equals("")){
+                        AnimalFather animalFather = new AnimalFather();
+                        animalFather.setFedeganCode(dtoAnimalParent.getFedeganCode());
+                        entityManager.merge(animalFather);
+                        animalMap.put("Animal", animalFather);
+                        return new CommunicationInterface.Builder().setSuccessful(true).setMessage("Created successfully").setData(animalMap).build();
+                    }else{
+                        animalMap.put("Mother", animalMother.get(0));
+                        return new CommunicationInterface.Builder().setSuccessful(false).setMessage("This animal already exist in mother").setData(animalMap).build();
+                    }
+                }
                 animalMap.put("Animal", animal.get(0));
                 return new CommunicationInterface.Builder().setMessage("Animal already exist").setSuccessful(false).setData(animalMap).build();
             }
+            AnimalFather animalFather = new AnimalFather();
+            animalFather.setFedeganCode(dtoAnimalParent.getFedeganCode());
             entityManager.merge(animalFather);
             animalMap.put("Animal", animalFather);
             return new CommunicationInterface.Builder().setSuccessful(true).setMessage("Created successfully").setData(animalMap).build();
@@ -54,12 +76,11 @@ public class AnimalFatherImplement implements AnimalFatherInterface {
     }
 
     @Override
-    public CommunicationInterface getByUUID(AnimalFather animalFather){
+    public CommunicationInterface getByUUID(DTOAnimalParent dtoAnimalParent){
         try {
             String query = "FROM AnimalFather WHERE idAnimalFather = :id_animal_father";
-            System.out.println(animalFather.getIdAnimalFather());
             List<AnimalFather> animalFind = entityManager.createQuery(query)
-                    .setParameter("id_animal_father", animalFather.getIdAnimalFather())
+                    .setParameter("id_animal_father", dtoAnimalParent.getIdAnimalParent())
                     .getResultList();
             if(animalFind.isEmpty()){
                 return new CommunicationInterface.Builder().setSuccessful(false).setMessage("The animal with this id doesn't exist").build();
@@ -73,11 +94,11 @@ public class AnimalFatherImplement implements AnimalFatherInterface {
     }
 
     @Override
-    public CommunicationInterface getByFedeganCode(AnimalFather animalFather){
+    public CommunicationInterface getByFedeganCode(DTOAnimalParent dtoAnimalParent){
         try {
             String query = "FROM AnimalFather WHERE fedeganCode = :fedegan_code";
             List<AnimalFather> animalFind = entityManager.createQuery(query)
-                    .setParameter("fedegan_code", animalFather.getFedeganCode())
+                    .setParameter("fedegan_code", dtoAnimalParent.getFedeganCode())
                     .getResultList();
             if(animalFind.isEmpty()){
                 return new CommunicationInterface.Builder().setSuccessful(false).setMessage("The animal with this fedegan code doesn't exist").build();
@@ -91,10 +112,10 @@ public class AnimalFatherImplement implements AnimalFatherInterface {
     }
 
     @Override
-    public CommunicationInterface editFather(AnimalFather animalFather){
+    public CommunicationInterface editFather(DTOAnimalParent dtoAnimalParent){
         try {
-            CommunicationInterface response = getByUUID(animalFather);
-            CommunicationInterface duplicate = getByFedeganCode(animalFather);
+            CommunicationInterface response = getByUUID(dtoAnimalParent);
+            CommunicationInterface duplicate = getByFedeganCode(dtoAnimalParent);
             if(!response.getSuccessful()){
                 return new CommunicationInterface.Builder().setSuccessful(response.getSuccessful()).setMessage(response.getMessage()).build();
             }
@@ -108,7 +129,7 @@ public class AnimalFatherImplement implements AnimalFatherInterface {
                 }
             }
             animalFatherFound.setIdAnimalFather(animalFatherFound.getIdAnimalFather());
-            animalFatherFound.setFedeganCode(animalFather.getFedeganCode());
+            animalFatherFound.setFedeganCode(dtoAnimalParent.getFedeganCode());
             Map<String, Object> animalMap = new HashMap<>();
             animalMap.put("Father", animalFatherFound);
             entityManager.merge(animalFatherFound);
@@ -119,9 +140,9 @@ public class AnimalFatherImplement implements AnimalFatherInterface {
     }
 
     @Override
-    public CommunicationInterface deleteFather(AnimalFather animalFather){
+    public CommunicationInterface deleteFather(DTOAnimalParent dtoAnimalParent){
         try {
-            CommunicationInterface response = getByUUID(animalFather);
+            CommunicationInterface response = getByUUID(dtoAnimalParent);
             if(!response.getSuccessful()){
                 return new CommunicationInterface.Builder().setSuccessful(response.getSuccessful()).setMessage(response.getMessage()).build();
             }
